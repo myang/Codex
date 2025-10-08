@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EV Charging Station Monitor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>EV Charging Station Monitor</h1>
+      <p>Watch the Virta station <code>#6224</code> and get a notification when it's no longer occupied.</p>
+    </header>
+
+    <section class="card">
+      <h2>Polling Settings</h2>
+      <form id="settings-form">
+        <label for="interval">Check every</label>
+        <div class="interval-input">
+          <input type="number" id="interval" min="1" value="10" required />
+          <span>minutes</span>
+        </div>
+        <button type="submit">Update interval</button>
+      </form>
+      <p class="hint">You can change the interval at any time. The app remembers your preference in this browser.</p>
+    </section>
+
+    <section class="card status">
+      <h2>Current Status</h2>
+      <div class="status-row">
+        <span class="label">Station status:</span>
+        <span id="station-status" class="value">Unknown</span>
+      </div>
+      <div class="status-row">
+        <span class="label">Last checked:</span>
+        <span id="last-checked" class="value">Never</span>
+      </div>
+      <div class="status-row">
+        <span class="label">Connectors:</span>
+        <span id="connectors" class="value">—</span>
+      </div>
+      <div class="status-row">
+        <span class="label">Next check:</span>
+        <span id="next-check" class="value">—</span>
+      </div>
+      <p id="status-message" class="message"></p>
+    </section>
+
+    <section class="card logs">
+      <h2>Recent Logs</h2>
+      <ul id="log-list"></ul>
+    </section>
+
+    <footer>
+      <p>Make sure to allow browser notifications so we can alert you as soon as the station is free.</p>
+      <button id="request-permission">Enable notifications</button>
+    </footer>
+  </main>
+
+  <template id="log-item-template">
+    <li>
+      <span class="log-time"></span>
+      <span class="log-message"></span>
+    </li>
+  </template>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>

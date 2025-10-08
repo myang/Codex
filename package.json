@@ -1,0 +1,25 @@
+{
+  "name": "ev-station-monitor",
+  "version": "1.0.0",
+  "description": "Web app that polls an EV charging station status and notifies when available.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [
+    "ev",
+    "charging",
+    "monitor",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
