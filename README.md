@@ -1,14 +1,14 @@
 # EV Charging Station Monitor
 
-A minimal web application that polls the Virta Global charging station API and notifies you when station **#6224** is no longer occupied. The polling cadence defaults to every 10 minutes and can be adjusted directly from the UI.
+A minimal web application that polls the Virta Global charging station API and notifies you when station **#6224** is no longer occupied. The polling cadence defaults to every 15 minutes and can be adjusted directly from the UI.
 
 The app is built with Node.js, Express, and a small client-side script. It is suitable for hosting on free Node-friendly platforms such as [Render](https://render.com/), [Railway](https://railway.app/), or [Fly.io](https://fly.io/).
 
 ## Features
 
 - Server-side proxy for the Virta Global station endpoint to avoid CORS issues.
-- Configurable polling interval (defaults to 10 minutes) persisted in the browser.
-- Browser notifications when the station status changes from `occupied` to any other state.
+- Configurable polling interval (defaults to 15 minutes) persisted in the browser.
+- Push notifications via Web Push when the station status changes from `occupied` to any other state.
 - Friendly dashboard with current status, next scheduled check, and recent activity log.
 
 ## Getting Started
@@ -47,6 +47,23 @@ Set the `PORT` environment variable if your host requires a specific port. You c
 1. Open the app in your browser.
 2. Click **Enable notifications** and allow the permission prompt.
 3. The app sends a notification whenever the station status is anything other than `occupied`.
+4. For iOS, add the site to your home screen (iOS 16.4+) so push notifications can reach your device.
+
+### Web Push Configuration
+
+The server sends push notifications even when the page is not open, but it requires VAPID keys. Generate a key pair and set the environment variables below:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+```bash
+export VAPID_PUBLIC_KEY="..."
+export VAPID_PRIVATE_KEY="..."
+export VAPID_SUBJECT="mailto:you@example.com"
+```
+
+You can also configure the server polling cadence via `POLL_INTERVAL_MINUTES` (defaults to 15).
 
 > Notifications require the page to stay open in the background. For mobile devices, consider adding the site to the home screen and keeping the browser tab active.
 
