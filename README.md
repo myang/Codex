@@ -2,7 +2,7 @@
 
 A minimal web application that polls the Virta Global charging station API and notifies you when station **#6224** is no longer occupied. The polling cadence defaults to every 10 minutes and can be adjusted directly from the UI.
 
-The app is built with Node.js, Express, and a small client-side script. It is suitable for hosting on free Node-friendly platforms such as [Render](https://render.com/), [Railway](https://railway.app/), or [Fly.io](https://fly.io/).
+The app is built with Node.js, Express, and a small client-side script. It is suitable for hosting on free Node-friendly platforms such as [Render](https://render.com/) or [Fly.io](https://fly.io/).
 
 ## Features
 
@@ -50,11 +50,26 @@ Set the `PORT` environment variable if your host requires a specific port. You c
 
 > Notifications require the page to stay open in the background. For mobile devices, consider adding the site to the home screen and keeping the browser tab active.
 
-## Deployment Tips
+## Deployment Tips (Recommended: Render)
 
-- For Render, create a new **Web Service** from this repo, choose the free instance type, and set the start command to `npm start`.
-- For Railway, create a **Node.js** project, connect the repo, and keep the default start command.
-- For Fly.io, initialize with `fly launch`, set the internal port to `3000`, and deploy with `fly deploy`.
+Render offers a dependable free tier for Node services. The free plan will sleep on inactivity, but it avoids the one-deploy-per-day limitation you hit on Vercel.
+
+### Render (free tier)
+
+1. Create a new **Web Service** in Render and point it at this GitHub repo.
+2. Choose the **Free** instance type.
+3. **Build Command:** `npm install`
+4. **Start Command:** `npm start`
+5. **Environment variables** (Render dashboard → *Environment*):
+   - `PORT`: provided automatically by Render (no action required).
+   - `STATION_URL`: optional override if you want to monitor a different station endpoint.
+6. Deploy. The app will be available at the Render URL, and it will wake on incoming requests.
+
+If you prefer configuration-as-code, this repo includes a `render.yaml` you can use when creating the service.
+
+### Fly.io (alternative)
+
+If you want more control over regions or an always-on option, Fly.io is a good alternative. Initialize with `fly launch`, set the internal port to `3000`, and deploy with `fly deploy`.
 
 ## License
 
