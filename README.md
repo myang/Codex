@@ -4,6 +4,10 @@ A minimal web application that polls the Virta Global charging station API and n
 
 The app is built with Node.js, Express, and a small client-side script. It is suitable for hosting on free Node-friendly platforms such as [Render](https://render.com/) or [Fly.io](https://fly.io/).
 
+## Scout Skills Repo
+
+The `scout` project is maintained as a separate local git repository at `/workspace/scout` with its skills stored under `.agent/skills`.
+
 ## Features
 
 - Server-side proxy for the Virta Global station endpoint to avoid CORS issues.
