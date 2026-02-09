@@ -1,4 +1,4 @@
-const DEFAULT_INTERVAL_MINUTES = 10;
+const DEFAULT_INTERVAL_MINUTES = 15;
 const STORAGE_KEY = 'ev-monitor-interval-minutes';
 
 const stationStatusEl = document.getElementById('station-status');
@@ -11,13 +11,16 @@ const settingsForm = document.getElementById('settings-form');
 const logList = document.getElementById('log-list');
 const logTemplate = document.getElementById('log-item-template');
 const permissionButton = document.getElementById('request-permission');
+const pushStatusEl = document.getElementById('push-status');
 
 const state = {
   intervalMinutes: loadInterval(),
   timer: null,
   nextCheck: null,
   lastStatus: null,
-  lastNotificationStatus: null
+  lastNotificationStatus: null,
+  pushSubscription: null,
+  pushSupported: false
 };
 
 intervalInput.value = state.intervalMinutes;
@@ -37,7 +40,7 @@ settingsForm.addEventListener('submit', (event) => {
 });
 
 permissionButton.addEventListener('click', () => {
-  requestNotificationPermission();
+  enablePushNotifications();
 });
 
 function loadInterval() {
@@ -212,12 +215,12 @@ function formatDate(date) {
 async function requestNotificationPermission() {
   if (!('Notification' in window)) {
     alert('Notifications are not supported in this browser.');
-    return;
+    return 'unsupported';
   }
 
   if (Notification.permission === 'granted') {
     appendLog('Notifications already enabled.');
-    return;
+    return Notification.permission;
   }
 
   try {
@@ -228,15 +231,91 @@ async function requestNotificationPermission() {
     } else {
       appendLog('Notifications were denied.');
     }
+    return permission;
   } catch (error) {
     appendLog(`Notification request failed: ${error.message}`);
+    return 'error';
   }
+}
+
+async function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) {
+    setPushStatus('Service workers are not supported in this browser.');
+    return null;
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    return registration;
+  } catch (error) {
+    setPushStatus(`Service worker registration failed: ${error.message}`);
+    return null;
+  }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+}
+
+async function enablePushNotifications() {
+  const registration = await registerServiceWorker();
+  if (!registration) {
+    return;
+  }
+
+  const permission = await requestNotificationPermission();
+  if (permission !== 'granted') {
+    setPushStatus('Notifications are disabled. Enable permissions to receive alerts.');
+    return;
+  }
+
+  try {
+    const configResponse = await fetch('/api/push-config');
+    const config = await configResponse.json();
+
+    if (!config.enabled || !config.publicKey) {
+      setPushStatus('Push notifications are not configured on the server yet.');
+      appendLog('Push notifications are disabled. Add VAPID keys to enable.');
+      return;
+    }
+
+    const applicationServerKey = urlBase64ToUint8Array(config.publicKey);
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey
+    });
+
+    await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subscription)
+    });
+
+    state.pushSubscription = subscription;
+    state.pushSupported = true;
+    setPushStatus('Push notifications enabled. You will be alerted when the station is free.');
+    appendLog('Push notifications enabled for this device.');
+  } catch (error) {
+    setPushStatus(`Unable to enable push notifications: ${error.message}`);
+    appendLog(`Push setup failed: ${error.message}`);
+  }
+}
+
+function setPushStatus(message) {
+  if (!pushStatusEl) {
+    return;
+  }
+  pushStatusEl.textContent = message;
 }
 
 function init() {
   appendLog('Starting EV station monitor.');
   schedulePolling(true);
   fetchStationStatus();
+  registerServiceWorker();
 }
 
 init();
