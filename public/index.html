@@ -18,7 +18,7 @@
       <form id="settings-form">
         <label for="interval">Check every</label>
         <div class="interval-input">
-          <input type="number" id="interval" min="1" value="10" required />
+          <input type="number" id="interval" min="1" value="15" required />
           <span>minutes</span>
         </div>
         <button type="submit">Update interval</button>
@@ -53,8 +53,9 @@
     </section>
 
     <footer>
-      <p>Make sure to allow browser notifications so we can alert you as soon as the station is free.</p>
-      <button id="request-permission">Enable notifications</button>
+      <p>Enable push notifications to receive alerts on your iPhone when the station is free.</p>
+      <button id="request-permission">Enable push notifications</button>
+      <p id="push-status" class="hint">Install this site to your home screen on iOS 16.4+ to receive push alerts.</p>
     </footer>
   </main>
 
